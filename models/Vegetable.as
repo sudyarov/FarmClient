@@ -3,18 +3,24 @@
 	public class Vegetable
 	{
 		private var id:int;
-		private var type:int;
-		private var x:int;
-		private var y:int;
-		private var stage:int;
+		public var type:int;
+		public var column:int;
+		public var row:int;
+		public var stage:int;
 
 		public function Vegetable(xml:XML)
 		{
 			id = xml.@id;
 			type = xml.@type;
-			x = xml.@x;
-			y = xml.@y;
+			column = xml.@x;
+			row = xml.@y;
 			stage = xml.@stage;
 		}
+		/*
+		public function toString():String
+		{
+			return "id=" + id + "|type=" + type + "|x=" + x + "|y=" + y + "|stage=" + stage;
+		}
+		*/
 	}
 }

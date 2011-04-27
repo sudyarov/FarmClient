@@ -82,8 +82,8 @@
 			{
 				//trace(vegetableXML.@type + "|" + vegetableXML.@x + "|" + vegetableXML.@y);
 				vegetables.push(new Vegetable(vegetableXML));
-				farm.drawVegetables();
 			}
+			farm.draw();
 		}
 	}
 }

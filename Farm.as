@@ -8,13 +8,15 @@
 	import models.Vegetable;	
 	import flash.display.DisplayObject;
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	
 	public class Farm extends Sprite
 	{
 		private var bgLoader:Loader;
 		var controller:Controller;
+		private var notLoadedCount:int = 0;
 		
-		var potatoImages:Array = [
+		var images:Object = {potato: [
 					{path: "http://localhost:3000/images/potato/Image 1.png", 
 					 image: null, y0: 24},
 					{path: "http://localhost:3000/images/potato/Image 3.png", 
@@ -25,7 +27,35 @@
 					 image: null, y0: 43},
 					 {path: "http://localhost:3000/images/potato/Image 10.png", 
 					 image: null, y0: 48}
-				   ];
+				   ], 
+				   clover: [
+					{path: "http://localhost:3000/images/clover/Image 1.png", 
+					 image: null, y0: 70},
+					{path: "http://localhost:3000/images/clover/Image 3.png", 
+					 image: null, y0: 26},
+					{path: "http://localhost:3000/images/clover/Image 5.png", 
+					 image: null, y0: 30},
+					 {path: "http://localhost:3000/images/clover/Image 7.png", 
+					 image: null, y0: 40},
+					 {path: "http://localhost:3000/images/clover/Image 9.png", 
+					 image: null, y0: 42}
+				   ],
+				   sunflower: [
+					{path: "http://localhost:3000/images/sunflower/Image 1.png", 
+					 image: null, y0: 25},
+					{path: "http://localhost:3000/images/sunflower/Image 3.png", 
+					 image: null, y0: 42},
+					{path: "http://localhost:3000/images/sunflower/Image 5.png", 
+					 image: null, y0: 57},
+					 {path: "http://localhost:3000/images/sunflower/Image 7.png", 
+					 image: null, y0: 81},
+					 {path: "http://localhost:3000/images/sunflower/Image 9.png", 
+					 image: null, y0: 98}
+				   ]};
+		
+		private const CLOVER:int = 1;
+		private const SUNFLOWER:int = 2;
+		private const POTATO:int = 3;
 		
 		public function Farm()
 		{
@@ -64,42 +94,70 @@
 			// "отанавливать" drag справа
 		}
 		
+		function onImageLoad(event:Event):void
+		{
+			notLoadedCount--;
+			if (notLoadedCount == 0)
+				drawVegetables();
+		}
+		
+		private function loadImages():void
+		{
+			var stage:int;
+			var vegType:String;
+			for each (var vegetable in controller.vegetables)
+			{
+				stage = vegetable.stage - 1;
+				if (vegetable.type == 1)
+					vegType = "clover";
+				else if (vegetable.type == 2)
+					vegType = "sunflower";
+				else if (vegetable.type == 3)
+					vegType = "potato";
+				if (images[vegType][stage].image == null)
+				{
+					var tempLoader:Loader = new Loader();
+					tempLoader.load(new URLRequest(images[vegType][stage].path));
+					notLoadedCount++;
+					tempLoader.contentLoaderInfo.addEventListener(Event.INIT, onImageLoad);
+					images[vegType][stage].image = tempLoader;
+				}
+
+			}
+		}
+		
+		function draw():void
+		{
+			loadImages();
+			if (notLoadedCount == 0)
+				drawVegetables();
+		}
+		
 		function drawVegetables():void
 		{
-			for (var i:int = 0; i < potatoImages.length; i++)
+			var stage:int;
+			var vegType:String;
+			for each (var vegetable in controller.vegetables)
 			{
-				if (potatoImages[i].image == null)
-				{
-					trace("111Loading: " + potatoImages[i].path);
-					var tempLoader:Loader = new Loader();
-					tempLoader.load(new URLRequest(potatoImages[i].path));
-					potatoImages[i].image = tempLoader;
-				}
-				
+				stage = vegetable.stage - 1;
+				if (vegetable.type == 1)
+					vegType = "clover";
+				else if (vegetable.type == 2)
+					vegType = "sunflower";
+				else if (vegetable.type == 3)
+					vegType = "potato";
+					
+				trace(vegetable);
 				var temp:Sprite = new Sprite();
-				temp.x = controller.FIELD_X0_PX + i * 55;
-				temp.y = controller.FIELD_Y0_PX - i * 28 - potatoImages[i].y0;
+				temp.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
+				temp.y = controller.FIELD_Y0_PX + (vegetable.column - vegetable.row) * 28 - 
+						 images[vegType][stage].y0;
+				temp.scaleX = 1;
+				temp.scaleY = 1;
 				this.addChild(temp);
-				temp.addChild(potatoImages[0].image);
+				temp.addChild(new Bitmap(Bitmap((images[vegType][stage].image as Loader).content).bitmapData.clone()));
+
 			}
-			/*
-			for (var i:int = potatoImages.length - 1; i >= 0; i--)
-			{
-				if (potatoImages[i].image == null)
-				{
-					//trace("Loading: " + potatoImages[i].path);
-					var tempLoader:Loader = new Loader();
-					tempLoader.load(new URLRequest(potatoImages[i].path));
-					potatoImages[i].image = tempLoader;
-				}
-				var temp:Sprite = new Sprite();
-				temp.x = controller.FIELD_X0_PX + 2 * i * 55;
-				temp.y = controller.FIELD_Y0_PX - i * 28 - potatoImages[i].y0;
-				this.addChild(temp);
-				temp.addChild(potatoImages[i].image);
-				
-			}
-			*/
 		}
 	}
 }
