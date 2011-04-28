@@ -91,7 +91,6 @@
 		private function startDragging(evt:MouseEvent):void
 		{
 			this.startDrag();
-			trace(evt.localX, evt.localY);
 			this.addEventListener(MouseEvent.MOUSE_MOVE, onMove);
 		}
 		
@@ -122,18 +121,18 @@
 		
 		private function loadImages():void
 		{
-			var stage:int;
+			var growthStage:int;
 			for each (var vegetable in controller.vegetables)
 			{
-				stage = vegetable.stage - 1;
+				growthStage = vegetable.growthStage - 1;
 
-				if (images[vegetable.type][stage].image == null)
+				if (images[vegetable.type][growthStage].image == null)
 				{
 					var tempLoader:Loader = new Loader();
-					tempLoader.load(new URLRequest(images[vegetable.type][stage].path));
+					tempLoader.load(new URLRequest(images[vegetable.type][growthStage].path));
 					notLoadedCount++;
 					tempLoader.contentLoaderInfo.addEventListener(Event.INIT, onImageLoad);
-					images[vegetable.type][stage].image = tempLoader;
+					images[vegetable.type][growthStage].image = tempLoader;
 				}
 			}
 		}
@@ -147,25 +146,31 @@
 		
 		function drawVegetables():void
 		{
-			var stage:int;
+			var growthStage:int;
 			for each (var vegetable in controller.vegetables)
 			{
-				stage = vegetable.stage - 1;
+				growthStage = vegetable.growthStage - 1;
 
 				//trace(vegetable);
-				vegetable.sprite.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
-				vegetable.sprite.y = controller.FIELD_Y0_PX + (vegetable.column - 
-									 vegetable.row) * 28 - images[vegetable.type][stage].y0;
-				this.addChild(vegetable.sprite);
-				vegetable.sprite.addChild(new Bitmap(Bitmap((images[vegetable.type][stage].image as Loader).content).bitmapData.clone()));
+				vegetable.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
+				vegetable.y = controller.FIELD_Y0_PX + (vegetable.column - 
+							  vegetable.row) * 28 - images[vegetable.type][growthStage].y0;
+				this.addChild(vegetable);
+				vegetable.addChild(new Bitmap(Bitmap((images[vegetable.type][growthStage].image as Loader).content).bitmapData.clone()));
 				
-				vegetable.sprite.addEventListener(MouseEvent.CLICK, vegetableClick);
+				vegetable.addEventListener(MouseEvent.CLICK, vegetableClick);
 			}
 		}
 		
 		function vegetableClick(event:MouseEvent):void
 		{
-			trace(Vegetable(event.target).row);
+			controller.deleteVegetable(event.target as Vegetable);
+		}
+		
+		function removeFromField(vegetable:Vegetable):void
+		{
+			vegetable.removeEventListener(MouseEvent.CLICK, vegetableClick);
+			this.removeChild(vegetable);
 		}
 	}
 }

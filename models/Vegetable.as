@@ -2,14 +2,13 @@
 {
 	import flash.display.Sprite;
 
-	public class Vegetable
+	public class Vegetable extends Sprite
 	{
-		private var id:int;
+		public var id:int;
 		public var type:String;
 		public var row:int;
 		public var column:int;
-		public var stage:int;
-		public var sprite:Sprite;
+		public var growthStage:int;
 
 		public function Vegetable(xml:XML)
 		{
@@ -17,8 +16,7 @@
 			type = xml.@type;
 			row = xml.@row;
 			column = xml.@column;
-			stage = xml.@stage;
-			sprite = new Sprite();
+			growthStage = xml.@stage;
 		}
 		/*
 		public function toString():String

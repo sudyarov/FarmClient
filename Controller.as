@@ -6,6 +6,7 @@
 	import flash.events.Event;
 	import models.Vegetable;
 	import flash.net.URLRequestMethod;
+	import flash.events.MouseEvent;
 
 	public class Controller
 	{
@@ -14,6 +15,7 @@
 		private var loader:URLLoader;
 		private var request:URLRequest;
 		private var farm:Farm;
+		private var id:int;
 		
 		public const FIELD_X0_PX:int = 120;
 		public const FIELD_Y0_PX:int = 430;
@@ -32,6 +34,15 @@
 			getField();
 		}
 		
+		public function getIndexByVegetableId(id:int):int
+		{
+			var length:int = vegetables.length;
+			for (var i:int = 0; i < length; i++)
+				if (vegetables[i].id == id)
+					return i;
+			return -1;
+		}
+		
 		public function loaderErrorHandler(event:IOErrorEvent):void
 		{
 			// обработать ошибку (как то отобразить)
@@ -43,7 +54,7 @@
 			var xml:XML = new XML(loader.data);
 			if (xml.name() == "error")
 			{
-				// error
+				trace("error");
 			}
 			else
 			{
@@ -54,9 +65,9 @@
 					/*
 				else if (command == "vegetableAdded")
 					addVegetableHandler(xml);
-				else if (command == "vegetableDeleted")
-					deleteVegetableHandler(xml);
 					*/
+				else if (command == "vegetableDeleted")
+					deleteVegetableHandler();
 			}
 		}
 		
@@ -77,6 +88,23 @@
 				vegetables.push(new Vegetable(vegetableXML));
 			}
 			farm.draw();
+		}
+		
+		public function deleteVegetable(vegetable:Vegetable):void
+		{
+			this.id = vegetable.id;
+			var xmlRequest:XML = new XML("<command name=\"delVegetable\"><vegetable id=\"\" /></command>");
+			xmlRequest.vegetable.@id = this.id;
+			request.data = "command=" + xmlRequest.toXMLString();
+			
+			loader.load(request);
+		}
+		
+		public function deleteVegetableHandler():void
+		{
+			var index:int = getIndexByVegetableId(this.id);
+			farm.removeFromField(vegetables[index]);
+			vegetables.splice(index, 1);
 		}
 	}
 }
