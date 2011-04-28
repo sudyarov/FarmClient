@@ -8,12 +8,18 @@
 	import models.Vegetable;	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.Stage;
+	
 	
 	public class Farm extends Sprite
 	{
 		private var bgLoader:Loader;
 		var controller:Controller;
 		private var notLoadedCount:int = 0;
+		private var windowWidth:int;
+		private var windowHeight:int;
+		private var backgroundWidth:int;
+		private var backgroundHeight:int;
 		
 		var images:Object = {potato: [
 					{path: "http://localhost:3000/images/potato/Image 1.png", 
@@ -55,20 +61,37 @@
 		public function Farm()
 		{
 			bgLoader = new Loader();
+			bgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 			controller = new Controller(this);
 			
 			this.addChild(bgLoader);
-			bgLoader.load(new URLRequest("http://localhost:3000/images/BG.jpg"));
+			bgLoader.load(new URLRequest("http://localhost:3000/images/BG.jpg"));			
+		}
+		
+		private function onLoadComplete(e:Event):void {
+			windowWidth = (this.parent.parent as Stage).stageWidth;
+			windowHeight = (this.parent.parent as Stage).stageHeight;
+			backgroundWidth = bgLoader.width;
+			backgroundHeight = bgLoader.height;
+			
+			// centering field
+			/*
+			this.x = -((backgroundWidth - windowWidth) / 2);
+			this.y = -((backgroundHeight - windowHeight) / 2);
+			*/
+			
+			this.x = -120;
+			this.y = -150;
 			
 			this.addEventListener(MouseEvent.MOUSE_DOWN, startDragging);
 			this.addEventListener(MouseEvent.MOUSE_UP, stopDragging);
 			this.addEventListener(MouseEvent.MOUSE_OUT, stopDragging);
 		}
 		
-		function startDragging(evt:MouseEvent):void
+		private function startDragging(evt:MouseEvent):void
 		{
-			//this.startDrag(false, new Rectangle(0, 0, 1565, 908));
 			this.startDrag();
+			trace(evt.localX, evt.localY);
 			this.addEventListener(MouseEvent.MOUSE_MOVE, onMove);
 		}
 		
@@ -80,14 +103,14 @@
 		
 		function onMove(evt:MouseEvent):void
 		{
-			//var width = mainSprite.width;
-			
 			if (this.x > 0)
 				this.x = 0;
+			else if (this.x < (windowWidth - backgroundWidth))
+				this.x = windowWidth - backgroundWidth;
 			if (this.y > 0)
 				this.y = 0;
-			
-			// "отанавливать" drag справа
+			else if (this.y < (windowHeight - backgroundHeight))
+				this.y = windowHeight - backgroundHeight;
 		}
 		
 		function onImageLoad(event:Event):void
