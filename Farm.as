@@ -6,7 +6,6 @@
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import models.Vegetable;	
-	import flash.display.DisplayObject;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	
@@ -52,11 +51,7 @@
 					 {path: "http://localhost:3000/images/sunflower/Image 9.png", 
 					 image: null, y0: 98}
 				   ]};
-		
-		private const CLOVER:int = 1;
-		private const SUNFLOWER:int = 2;
-		private const POTATO:int = 3;
-		
+
 		public function Farm()
 		{
 			bgLoader = new Loader();
@@ -72,6 +67,7 @@
 		
 		function startDragging(evt:MouseEvent):void
 		{
+			//this.startDrag(false, new Rectangle(0, 0, 1565, 908));
 			this.startDrag();
 			this.addEventListener(MouseEvent.MOUSE_MOVE, onMove);
 		}
@@ -104,25 +100,18 @@
 		private function loadImages():void
 		{
 			var stage:int;
-			var vegType:String;
 			for each (var vegetable in controller.vegetables)
 			{
 				stage = vegetable.stage - 1;
-				if (vegetable.type == 1)
-					vegType = "clover";
-				else if (vegetable.type == 2)
-					vegType = "sunflower";
-				else if (vegetable.type == 3)
-					vegType = "potato";
-				if (images[vegType][stage].image == null)
+
+				if (images[vegetable.type][stage].image == null)
 				{
 					var tempLoader:Loader = new Loader();
-					tempLoader.load(new URLRequest(images[vegType][stage].path));
+					tempLoader.load(new URLRequest(images[vegetable.type][stage].path));
 					notLoadedCount++;
 					tempLoader.contentLoaderInfo.addEventListener(Event.INIT, onImageLoad);
-					images[vegType][stage].image = tempLoader;
+					images[vegetable.type][stage].image = tempLoader;
 				}
-
 			}
 		}
 		
@@ -136,28 +125,24 @@
 		function drawVegetables():void
 		{
 			var stage:int;
-			var vegType:String;
 			for each (var vegetable in controller.vegetables)
 			{
 				stage = vegetable.stage - 1;
-				if (vegetable.type == 1)
-					vegType = "clover";
-				else if (vegetable.type == 2)
-					vegType = "sunflower";
-				else if (vegetable.type == 3)
-					vegType = "potato";
-					
-				trace(vegetable);
-				var temp:Sprite = new Sprite();
-				temp.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
-				temp.y = controller.FIELD_Y0_PX + (vegetable.column - vegetable.row) * 28 - 
-						 images[vegType][stage].y0;
-				temp.scaleX = 1;
-				temp.scaleY = 1;
-				this.addChild(temp);
-				temp.addChild(new Bitmap(Bitmap((images[vegType][stage].image as Loader).content).bitmapData.clone()));
 
+				//trace(vegetable);
+				vegetable.sprite.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
+				vegetable.sprite.y = controller.FIELD_Y0_PX + (vegetable.column - 
+									 vegetable.row) * 28 - images[vegetable.type][stage].y0;
+				this.addChild(vegetable.sprite);
+				vegetable.sprite.addChild(new Bitmap(Bitmap((images[vegetable.type][stage].image as Loader).content).bitmapData.clone()));
+				
+				vegetable.sprite.addEventListener(MouseEvent.CLICK, vegetableClick);
 			}
+		}
+		
+		function vegetableClick(event:MouseEvent):void
+		{
+			trace(Vegetable(event.target).row);
 		}
 	}
 }

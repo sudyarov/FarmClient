@@ -6,7 +6,6 @@
 	import flash.events.Event;
 	import models.Vegetable;
 	import flash.net.URLRequestMethod;
-	import flash.display.DisplayObject;
 
 	public class Controller
 	{
@@ -18,10 +17,6 @@
 		
 		public const FIELD_X0_PX:int = 120;
 		public const FIELD_Y0_PX:int = 430;
-		//private const FIELD_WIDTH_PX:int = 
-		
-		public var fieldWidth:int;
-		public var fieldHeight:int;
 		
 		public var vegetables:Array;
 		
@@ -48,7 +43,7 @@
 			var xml:XML = new XML(loader.data);
 			if (xml.name() == "error")
 			{
-				// ошибка
+				// error
 			}
 			else
 			{
@@ -75,12 +70,10 @@
 		/* fills collection of vegetables */
 		public function getFieldHandler(xml:XML):void
 		{
-			// может не очень хороший вариант очистки
 			vegetables.length = 0;
 			
 			for each (var vegetableXML:XML in xml.children())
 			{
-				//trace(vegetableXML.@type + "|" + vegetableXML.@x + "|" + vegetableXML.@y);
 				vegetables.push(new Vegetable(vegetableXML));
 			}
 			farm.draw();
