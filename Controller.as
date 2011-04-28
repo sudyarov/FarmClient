@@ -68,6 +68,8 @@
 					*/
 				else if (command == "vegetableDeleted")
 					deleteVegetableHandler();
+				else if (command == "nextStep")
+					nextStepHandler();
 			}
 		}
 		
@@ -81,11 +83,26 @@
 		/* fills collection of vegetables */
 		public function getFieldHandler(xml:XML):void
 		{
-			vegetables.length = 0;
-			
 			for each (var vegetableXML:XML in xml.children())
 			{
 				vegetables.push(new Vegetable(vegetableXML));
+			}
+			farm.draw();
+		}
+		
+		public function nextStep():void
+		{
+			var xmlRequest:XML = new XML("<command name=\"nextStep\" />");
+			request.data = "command=" + xmlRequest.toXMLString();
+			loader.load(request);
+		}
+		
+		public function nextStepHandler():void
+		{
+			for each (var vegetable:Vegetable in vegetables)
+			{
+				if (vegetable.growthStage < 5)
+					vegetable.growthStage++;
 			}
 			farm.draw();
 		}

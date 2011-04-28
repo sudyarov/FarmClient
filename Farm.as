@@ -162,11 +162,19 @@
 			{
 				growthStage = vegetable.growthStage - 1;
 
-				//trace(vegetable);
-				vegetable.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
+				if (vegetable.numChildren == 0)
+				{
+					vegetable.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
+					field.addChild(vegetable);
+				}
+				else
+				{
+					var child:Bitmap = (vegetable as Vegetable).getChildAt(0) as Bitmap;
+					(vegetable as Vegetable).removeChild(child);
+					child = null;
+				}
 				vegetable.y = controller.FIELD_Y0_PX + (vegetable.column - 
 							  vegetable.row) * 28 - images[vegetable.type][growthStage].y0;
-				field.addChild(vegetable);
 				vegetable.addChild(new Bitmap(Bitmap((images[vegetable.type][growthStage].image as Loader).content).bitmapData.clone()));
 				
 				vegetable.addEventListener(MouseEvent.CLICK, vegetableClick);

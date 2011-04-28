@@ -12,6 +12,7 @@
 		private var moveButton:Button;
 		private var addButton:Button;
 		private var harvestButton:Button;
+		private var nextStepButton:Button;
 
 		public function Toolbar()
 		{
@@ -20,6 +21,7 @@
 			loader.load(new URLRequest("http://localhost:3000/images/toolbar.jpg"));
 			
 			moveButton = new Button();
+			moveButton.label = "";
 			moveButton.x = 20;
 			moveButton.y = Constants.TOP_MARGIN;
 			moveButton.width = Constants.BUTTON_WIDTH;
@@ -33,6 +35,7 @@
 			moveButton.addChild(mloader);
 			
 			addButton = new Button();
+			addButton.label = "";
 			addButton.x = 110;
 			addButton.y = Constants.TOP_MARGIN;
 			addButton.width = Constants.BUTTON_WIDTH;
@@ -46,6 +49,7 @@
 			addButton.addChild(aloader);
 			
 			harvestButton = new Button();
+			harvestButton.label = "";
 			harvestButton.x = 200;
 			harvestButton.y = Constants.TOP_MARGIN;
 			harvestButton.width = Constants.BUTTON_WIDTH;
@@ -57,6 +61,20 @@
 			hloader.x = 5;
 			hloader.y = 10;
 			harvestButton.addChild(hloader);
+			
+			nextStepButton = new Button();
+			nextStepButton.label = "";
+			nextStepButton.x = 290;
+			nextStepButton.y = Constants.TOP_MARGIN;
+			nextStepButton.width = Constants.BUTTON_WIDTH;
+			nextStepButton.height = Constants.BUTTON_HEIGHT;
+			nextStepButton.addEventListener(MouseEvent.CLICK, nextStepButtonClick);
+			this.addChild(nextStepButton);
+			var nsloader:Loader = new Loader();
+			nsloader.load(new URLRequest("http://localhost:3000/images/nextStep.png"));
+			nsloader.x = 5;
+			nsloader.y = 15;
+			nextStepButton.addChild(nsloader);
 			
 			moveButton.emphasized = true;
 		}
@@ -83,6 +101,15 @@
 			addButton.emphasized = false;
 			harvestButton.emphasized = true;
 			(this.parent as Farm).currentState = Constants.HARVEST_STATE;
+		}
+		
+		public function nextStepButtonClick(event:MouseEvent):void
+		{
+			moveButton.emphasized = true;
+			addButton.emphasized = false;
+			harvestButton.emphasized = false;
+			(this.parent as Farm).currentState = Constants.MOVE_STATE;
+			(this.parent as Farm).controller.nextStep();
 		}
 	}
 }
