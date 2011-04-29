@@ -13,5 +13,9 @@
 		public static const MOVE_STATE:String = "move";
 		public static const ADD_STATE:String = "add";
 		public static const HARVEST_STATE:String = "harvest";
+		
+		/**/
+		public static const SERVER_URL:String = "http://localhost:3000/";
+		public static const MAIN_CONTROLLER_URL:String = "request/main";
 	}
 }

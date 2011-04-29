@@ -7,31 +7,64 @@
 	import models.Vegetable;
 	import flash.net.URLRequestMethod;
 	import flash.events.MouseEvent;
+	import flash.net.URLLoaderDataFormat;
+	import flash.display.Sprite;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.Loader;
 
 	public class Controller
 	{
-		private static const URL:String = "http://localhost:3000/request/main";
-		
 		private var loader:URLLoader;
 		private var request:URLRequest;
 		private var farm:Farm;
 		private var id:int;
+		private var notLoadedImages:Array;
 		
 		public const FIELD_X0_PX:int = 120;
 		public const FIELD_Y0_PX:int = 430;
 		
 		public var vegetables:Array;
 		
+		//private var imageLoader:URLLoader;
+		private var imageLoader:Loader;
+		
 		public function Controller(obj:Object)
 		{
+			imageLoader = new Loader();
+			imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imageLoaderCompleteHandler);
+			
 			farm = obj as Farm;
 			loader = new URLLoader();
 			loader.addEventListener(IOErrorEvent.IO_ERROR, loaderErrorHandler);
 			loader.addEventListener(Event.COMPLETE, loaderCompleteHandler);
-			request = new URLRequest(URL);
+			request = new URLRequest(Constants.SERVER_URL + Constants.MAIN_CONTROLLER_URL);
 			request.method = URLRequestMethod.POST;
 			vegetables = new Array();
 			getField();
+		}
+		
+		public function getImages(notLoadedImages:Array):void
+		{
+			this.notLoadedImages = notLoadedImages;
+			
+			var xmlRequest:XML = new XML("<command name=\"getImage\" type=\"\" stage=\"\" />");
+			xmlRequest.@type = notLoadedImages[0].vtype;
+			xmlRequest.@stage = notLoadedImages[0].growthStage;
+			request.data = "command=" + xmlRequest.toXMLString();
+			imageLoader.load(request);
+		}
+		
+		public function imageLoaderCompleteHandler(event:Event):void
+		{
+			var veg:Object = this.notLoadedImages[0];
+			farm.images[veg.vtype][veg.growthStage - 1].image = Bitmap(imageLoader.content).bitmapData.clone();
+
+			this.notLoadedImages.shift();
+			if (this.notLoadedImages.length != 0)
+				getImages(notLoadedImages);
+			else
+				farm.drawVegetables();
 		}
 		
 		public function getIndexByVegetableId(id:int):int

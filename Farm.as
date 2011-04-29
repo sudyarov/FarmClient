@@ -22,46 +22,20 @@
 		private var backgroundHeight:int;
 		
 		private var toolbar:Toolbar;
-		private var field:Sprite;
+		public var field:Sprite;
 		
 		public var currentState:String;
 		
-		var images:Object = {potato: [
-					{path: "http://localhost:3000/images/potato/Image 1.png", 
-					 image: null, y0: 24},
-					{path: "http://localhost:3000/images/potato/Image 3.png", 
-					 image: null, y0: 24},
-					{path: "http://localhost:3000/images/potato/Image 5.png", 
-					 image: null, y0: 40},
-					 {path: "http://localhost:3000/images/potato/Image 7.png", 
-					 image: null, y0: 43},
-					 {path: "http://localhost:3000/images/potato/Image 10.png", 
-					 image: null, y0: 48}
-				   ], 
-				   clover: [
-					{path: "http://localhost:3000/images/clover/Image 1.png", 
-					 image: null, y0: 70},
-					{path: "http://localhost:3000/images/clover/Image 3.png", 
-					 image: null, y0: 26},
-					{path: "http://localhost:3000/images/clover/Image 5.png", 
-					 image: null, y0: 30},
-					 {path: "http://localhost:3000/images/clover/Image 7.png", 
-					 image: null, y0: 40},
-					 {path: "http://localhost:3000/images/clover/Image 9.png", 
-					 image: null, y0: 42}
-				   ],
-				   sunflower: [
-					{path: "http://localhost:3000/images/sunflower/Image 1.png", 
-					 image: null, y0: 25},
-					{path: "http://localhost:3000/images/sunflower/Image 3.png", 
-					 image: null, y0: 42},
-					{path: "http://localhost:3000/images/sunflower/Image 5.png", 
-					 image: null, y0: 57},
-					 {path: "http://localhost:3000/images/sunflower/Image 7.png", 
-					 image: null, y0: 81},
-					 {path: "http://localhost:3000/images/sunflower/Image 9.png", 
-					 image: null, y0: 98}
-				   ]};
+		public var images:Object = {
+			potato: [{image: null, y0: 24},	{image: null, y0: 24}, {image: null, y0: 40},
+					 {image: null, y0: 43},	{image: null, y0: 48}
+				    ], 
+			clover: [{image: null, y0: 70},	{image: null, y0: 26}, {image: null, y0: 30},
+					 {image: null, y0: 40},	{image: null, y0: 42}
+				    ],
+			sunflower: [{image: null, y0: 25}, {image: null, y0: 42}, {image: null, y0: 57},
+					    {image: null, y0: 81}, {image: null, y0: 98}
+				    ]};
 
 		public function Farm()
 		{
@@ -122,36 +96,33 @@
 			else if (field.y < (windowHeight - backgroundHeight))
 				field.y = windowHeight - backgroundHeight;
 		}
-		
-		function onImageLoad(event:Event):void
-		{
-			notLoadedCount--;
-			if (notLoadedCount == 0)
-				drawVegetables();
-		}
-		
-		private function loadImages():void
+
+		private function loadImages():int
 		{
 			var growthStage:int;
+			var result:int = 0;
+			var notLoadedImages:Array = new Array();
+			
 			for each (var vegetable in controller.vegetables)
 			{
 				growthStage = vegetable.growthStage - 1;
 
 				if (images[vegetable.type][growthStage].image == null)
 				{
-					var tempLoader:Loader = new Loader();
-					tempLoader.load(new URLRequest(images[vegetable.type][growthStage].path));
-					notLoadedCount++;
-					tempLoader.contentLoaderInfo.addEventListener(Event.INIT, onImageLoad);
-					images[vegetable.type][growthStage].image = tempLoader;
+					notLoadedImages.push({vtype: vegetable.type, growthStage: vegetable.growthStage});
+					result++;
 				}
 			}
+			
+			if (result != 0)
+				controller.getImages(notLoadedImages);
+			
+			return result;
 		}
 		
 		function draw():void
 		{
-			loadImages();
-			if (notLoadedCount == 0)
+			if (loadImages() == 0)
 				drawVegetables();
 		}
 		
@@ -175,7 +146,7 @@
 				}
 				vegetable.y = controller.FIELD_Y0_PX + (vegetable.column - 
 							  vegetable.row) * 28 - images[vegetable.type][growthStage].y0;
-				vegetable.addChild(new Bitmap(Bitmap((images[vegetable.type][growthStage].image as Loader).content).bitmapData.clone()));
+				vegetable.addChild(new Bitmap((images[vegetable.type][growthStage].image as BitmapData).clone()));
 				
 				vegetable.addEventListener(MouseEvent.CLICK, vegetableClick);
 			}
