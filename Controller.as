@@ -21,12 +21,8 @@
 		private var id:int;
 		private var notLoadedImages:Array;
 		
-		public const FIELD_X0_PX:int = 120;
-		public const FIELD_Y0_PX:int = 430;
-		
 		public var vegetables:Array;
 		
-		//private var imageLoader:URLLoader;
 		private var imageLoader:Loader;
 		
 		public function Controller(obj:Object)
@@ -48,14 +44,14 @@
 		{
 			this.notLoadedImages = notLoadedImages;
 			
-			var xmlRequest:XML = new XML("<command name=\"getImage\" type=\"\" stage=\"\" />");
+			var xmlRequest:XML = new XML(Constants.GET_IMAGE_REQUEST);
 			xmlRequest.@type = notLoadedImages[0].vtype;
 			xmlRequest.@stage = notLoadedImages[0].growthStage;
-			request.data = "command=" + xmlRequest.toXMLString();
+			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			imageLoader.load(request);
 		}
 		
-		public function imageLoaderCompleteHandler(event:Event):void
+		private function imageLoaderCompleteHandler(event:Event):void
 		{
 			var veg:Object = this.notLoadedImages[0];
 			farm.images[veg.vtype][veg.growthStage - 1].image = Bitmap(imageLoader.content).bitmapData.clone();
@@ -67,7 +63,7 @@
 				farm.drawVegetables();
 		}
 		
-		public function getIndexByVegetableId(id:int):int
+		private function getIndexByVegetableId(id:int):int
 		{
 			var length:int = vegetables.length;
 			for (var i:int = 0; i < length; i++)
@@ -76,16 +72,16 @@
 			return -1;
 		}
 		
-		public function loaderErrorHandler(event:IOErrorEvent):void
+		private function loaderErrorHandler(event:IOErrorEvent):void
 		{
 			// обработать ошибку (как то отобразить)
 		}
 		
-		public function loaderCompleteHandler(event:Event):void
+		private function loaderCompleteHandler(event:Event):void
 		{
 			/* check responce for errors*/
 			var xml:XML = new XML(loader.data);
-			if (xml.name() == "error")
+			if (xml.name() == Constants.ERROR_RESPONCE)
 			{
 				trace("error");
 			}
@@ -93,28 +89,26 @@
 			{
 				/* launch handler if there are no errors */
 				var command:String = xml.@name;
-				if (command == "field")
+				if (command == Constants.FIELD_RESPONCE)
 					getFieldHandler(xml);
-					/*
-				else if (command == "vegetableAdded")
+				else if (command == Constants.VEGETABLE_ADDED_RESPONCE)
 					addVegetableHandler(xml);
-					*/
-				else if (command == "vegetableDeleted")
+				else if (command == Constants.VEGETABLE_DELETED_RESPONCE)
 					deleteVegetableHandler();
-				else if (command == "nextStep")
+				else if (command == Constants.NEXT_STEP_RESPONCE)
 					nextStepHandler();
 			}
 		}
 		
 		public function getField():void
 		{
-			var xmlRequest:XML = new XML("<command name=\"getField\" />");
-			request.data = "command=" + xmlRequest.toXMLString();
+			var xmlRequest:XML = new XML(Constants.GET_FIELD_REQUEST);
+			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			loader.load(request);
 		}
 		
 		/* fills collection of vegetables */
-		public function getFieldHandler(xml:XML):void
+		private function getFieldHandler(xml:XML):void
 		{
 			for each (var vegetableXML:XML in xml.children())
 			{
@@ -125,12 +119,12 @@
 		
 		public function nextStep():void
 		{
-			var xmlRequest:XML = new XML("<command name=\"nextStep\" />");
-			request.data = "command=" + xmlRequest.toXMLString();
+			var xmlRequest:XML = new XML(Constants.NEXT_STEP_REQUEST);
+			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			loader.load(request);
 		}
 		
-		public function nextStepHandler():void
+		private function nextStepHandler():void
 		{
 			for each (var vegetable:Vegetable in vegetables)
 			{
@@ -143,18 +137,35 @@
 		public function deleteVegetable(vegetable:Vegetable):void
 		{
 			this.id = vegetable.id;
-			var xmlRequest:XML = new XML("<command name=\"delVegetable\"><vegetable id=\"\" /></command>");
+			var xmlRequest:XML = new XML(Constants.DELETE_VEGETABLE_REQUEST);
 			xmlRequest.vegetable.@id = this.id;
-			request.data = "command=" + xmlRequest.toXMLString();
+			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			
 			loader.load(request);
 		}
 		
-		public function deleteVegetableHandler():void
+		private function deleteVegetableHandler():void
 		{
 			var index:int = getIndexByVegetableId(this.id);
 			farm.removeFromField(vegetables[index]);
 			vegetables.splice(index, 1);
+		}
+		
+		public function addVegetable(type:String, row:int, column:int):void
+		{
+			var xmlRequest:XML = new XML(Constants.ADD_VEGETABLE_REQUEST);
+			xmlRequest.vegetable.@type = type;
+			xmlRequest.vegetable.@row = row;
+			xmlRequest.vegetable.@column = column;
+			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
+			
+			loader.load(request);
+		}
+		
+		private function addVegetableHandler(xml:XML):void
+		{
+			vegetables.push(new Vegetable(XML(xml.vegetable)));
+			farm.draw();
 		}
 	}
 }

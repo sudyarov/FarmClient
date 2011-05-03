@@ -18,11 +18,5 @@
 			column = xml.@column;
 			growthStage = xml.@stage;
 		}
-		/*
-		public function toString():String
-		{
-			return "id=" + id + "|type=" + type + "|x=" + x + "|y=" + y + "|stage=" + stage;
-		}
-		*/
 	}
 }

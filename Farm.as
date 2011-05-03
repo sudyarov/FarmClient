@@ -9,32 +9,38 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Stage;
+	import flash.geom.Rectangle;
+	import flash.geom.Matrix;
+	import flash.display.GradientType;
+	import flash.display.SpreadMethod;
+	import flash.geom.Point;
 	
 	
 	public class Farm extends Sprite
 	{
 		private var bgLoader:Loader;
 		var controller:Controller;
-		private var notLoadedCount:int = 0;
-		private var windowWidth:int;
-		private var windowHeight:int;
+		public var windowWidth:int;
+		public var windowHeight:int;
 		private var backgroundWidth:int;
 		private var backgroundHeight:int;
 		
 		private var toolbar:Toolbar;
-		public var field:Sprite;
+		private var field:Sprite;
+		private var grid:Sprite;
 		
 		public var currentState:String;
+		public var selectedVegType:String;
 		
 		public var images:Object = {
-			potato: [{image: null, y0: 24},	{image: null, y0: 24}, {image: null, y0: 40},
-					 {image: null, y0: 43},	{image: null, y0: 48}
+			potato: [{image: null, y0: 26},	{image: null, y0: 26}, {image: null, y0: 42},
+					 {image: null, y0: 45},	{image: null, y0: 50}
 				    ], 
-			clover: [{image: null, y0: 70},	{image: null, y0: 26}, {image: null, y0: 30},
-					 {image: null, y0: 40},	{image: null, y0: 42}
+			clover: [{image: null, y0: 72},	{image: null, y0: 28}, {image: null, y0: 32},
+					 {image: null, y0: 42},	{image: null, y0: 44}
 				    ],
-			sunflower: [{image: null, y0: 25}, {image: null, y0: 42}, {image: null, y0: 57},
-					    {image: null, y0: 81}, {image: null, y0: 98}
+			sunflower: [{image: null, y0: 27}, {image: null, y0: 44}, {image: null, y0: 59},
+					    {image: null, y0: 83}, {image: null, y0: 100}
 				    ]};
 
 		public function Farm()
@@ -48,17 +54,114 @@
 			this.addChild(field);
 			
 			field.addChild(bgLoader);
-			bgLoader.load(new URLRequest("http://localhost:3000/images/BG.jpg"));
+			bgLoader.load(new URLRequest(Constants.SERVER_URL + Constants.FIELD_BACKGROUND_URL));
 			
 			toolbar = new Toolbar();
 			this.addChild(toolbar);
 			
 			currentState = Constants.MOVE_STATE;
+			
+			grid = new Sprite();
+			field.addChild(grid);
+			field.addEventListener(MouseEvent.CLICK, gridClick);
+			drawGrid();
+		}
+		
+		private function gridClick(event:MouseEvent):void
+		{
+			if (this.currentState == Constants.ADD_STATE)
+			{
+				if (!(event.target is Vegetable))
+				{
+					var point:Point = getCell(event.localX, event.localY);
+					if (point != null)
+					{
+						// point.x - column
+						// point.y - row
+						controller.addVegetable(this.selectedVegType, point.y, point.x);
+					}
+				}
+			}
+		}
+		
+		private function getCoords(row:int, column:int):Point
+		{
+			var result:Point = new Point();
+			
+			// rotate
+			// x' = x*cos(a) - y*sin(a)
+			// y' = x*sin(a) + y*cos(a)
+			result.x = (column * Constants.COL_WIDTH) * Math.cos(Constants.ROTATE_ANGLE) + 
+				       (row * Constants.ROW_HEIGHT) * Math.sin(Constants.ROTATE_ANGLE);
+			result.y = (column * Constants.COL_WIDTH) * Math.sin(Constants.ROTATE_ANGLE) - 
+				       (row * Constants.ROW_HEIGHT) * Math.cos(Constants.ROTATE_ANGLE);
+			
+			// compression
+			result.y *= Constants.COMPRESSION;
+			
+			// shift
+			result.x += Constants.FIELD_X0_PX;
+			result.y += Constants.FIELD_Y0_PX;
+			
+			return result;
+		}
+		
+		private function getCell(x:Number, y:Number):Point
+		{
+			var result:Point = new Point();
+			
+			x -= Constants.FIELD_X0_PX;
+			y -= Constants.FIELD_Y0_PX;
+			
+			// uncompress
+			y /= Constants.COMPRESSION;
+			
+			// rotate
+			result.x = x * Math.cos(Constants.ROTATE_ANGLE) + 
+				       y * Math.sin(Constants.ROTATE_ANGLE);
+			result.y = x * Math.sin(Constants.ROTATE_ANGLE) - 
+				       y * Math.cos(Constants.ROTATE_ANGLE);
+			
+			// outside field
+			if ((result.x < 0) || (result.y < 0))
+				return null;
+			else if ((result.x > (Constants.COL_COUNT * Constants.COL_WIDTH)) || 
+					 (result.y > (Constants.ROW_COUNT * Constants.ROW_HEIGHT)))
+				return null;
+			
+			// get row and column indexes
+			result.x = (int)(result.x / Constants.COL_WIDTH);
+			result.y = (int)(result.y / Constants.ROW_HEIGHT);
+			
+			return result;
+		}
+		
+		private function drawGrid():void
+		{
+			var point:Point;
+			var i:int;
+
+			grid.graphics.lineStyle(1, 0xCCCCCC);
+			for (i = 0; i <= Constants.ROW_COUNT; i++)
+			{
+				point = getCoords(i, 0);
+				grid.graphics.moveTo(point.x, point.y);
+				
+				point = getCoords(i, Constants.COL_COUNT);
+				grid.graphics.lineTo(point.x, point.y);
+			}
+			
+			for (i = 0; i <= Constants.COL_COUNT; i++)
+			{
+				point = getCoords(0, i);
+				grid.graphics.moveTo(point.x, point.y);
+				
+				point = getCoords(Constants.COL_COUNT, i);
+				grid.graphics.lineTo(point.x, point.y);
+			}
 		}
 		
 		private function onLoadComplete(e:Event):void {
-			windowWidth = (this.parent.parent as Stage).stageWidth;
-			windowHeight = (this.parent.parent as Stage).stageHeight;
 			backgroundWidth = bgLoader.width;
 			backgroundHeight = bgLoader.height;
 			
@@ -76,7 +179,7 @@
 			}
 		}
 		
-		function stopDragging(evt:MouseEvent):void
+		private function stopDragging(evt:MouseEvent):void
 		{
 			if (currentState == Constants.MOVE_STATE)
 			{
@@ -85,7 +188,7 @@
 			}
 		}
 		
-		function onMove(evt:MouseEvent):void
+		private function onMove(evt:MouseEvent):void
 		{
 			if (field.x > 0)
 				field.x = 0;
@@ -120,23 +223,28 @@
 			return result;
 		}
 		
-		function draw():void
+		public function draw():void
 		{
 			if (loadImages() == 0)
 				drawVegetables();
 		}
 		
-		function drawVegetables():void
+		public function drawVegetables():void
 		{
 			var growthStage:int;
+			var point:Point;
+			
 			for each (var vegetable in controller.vegetables)
 			{
 				growthStage = vegetable.growthStage - 1;
 
+				point = getCoords(vegetable.row, vegetable.column);
+
 				if (vegetable.numChildren == 0)
 				{
-					vegetable.x = controller.FIELD_X0_PX + (vegetable.column + vegetable.row) * 55;
+					vegetable.x = point.x + Constants.VEGETABLE_X_OFFSET;
 					field.addChild(vegetable);
+					vegetable.addEventListener(MouseEvent.CLICK, vegetableClick);
 				}
 				else
 				{
@@ -144,21 +252,18 @@
 					(vegetable as Vegetable).removeChild(child);
 					child = null;
 				}
-				vegetable.y = controller.FIELD_Y0_PX + (vegetable.column - 
-							  vegetable.row) * 28 - images[vegetable.type][growthStage].y0;
+				vegetable.y = point.y - images[vegetable.type][growthStage].y0;
 				vegetable.addChild(new Bitmap((images[vegetable.type][growthStage].image as BitmapData).clone()));
-				
-				vegetable.addEventListener(MouseEvent.CLICK, vegetableClick);
 			}
 		}
 		
-		function vegetableClick(event:MouseEvent):void
+		private function vegetableClick(event:MouseEvent):void
 		{
 			if (currentState == Constants.HARVEST_STATE)
 				controller.deleteVegetable(event.target as Vegetable);
 		}
 		
-		function removeFromField(vegetable:Vegetable):void
+		public function removeFromField(vegetable:Vegetable):void
 		{
 			vegetable.removeEventListener(MouseEvent.CLICK, vegetableClick);
 			field.removeChild(vegetable);
