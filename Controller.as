@@ -78,7 +78,7 @@
 		
 		private function loaderErrorHandler(event:IOErrorEvent):void
 		{
-			// обработать ошибку (как то отобразить)
+			trace("error");
 		}
 		
 		private function loaderCompleteHandler(event:Event):void
