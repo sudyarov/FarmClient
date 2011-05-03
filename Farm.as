@@ -8,11 +8,6 @@
 	import models.Vegetable;	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.Stage;
-	import flash.geom.Rectangle;
-	import flash.geom.Matrix;
-	import flash.display.GradientType;
-	import flash.display.SpreadMethod;
 	import flash.geom.Point;
 	
 	

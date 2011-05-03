@@ -6,8 +6,6 @@
 	import flash.events.Event;
 	import models.Vegetable;
 	import flash.net.URLRequestMethod;
-	import flash.events.MouseEvent;
-	import flash.net.URLLoaderDataFormat;
 	import flash.display.Sprite;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -29,6 +27,7 @@
 		{
 			imageLoader = new Loader();
 			imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imageLoaderCompleteHandler);
+			imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageLoaderErrorHandler);
 			
 			farm = obj as Farm;
 			loader = new URLLoader();
@@ -61,6 +60,11 @@
 				getImages(notLoadedImages);
 			else
 				farm.drawVegetables();
+		}
+		
+		private function imageLoaderErrorHandler(event:IOErrorEvent):void
+		{
+			trace("error");
 		}
 		
 		private function getIndexByVegetableId(id:int):int

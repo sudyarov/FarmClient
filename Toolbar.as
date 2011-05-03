@@ -5,7 +5,6 @@
 	import flash.display.Sprite;
 	import flash.display.Loader;
 	import flash.net.URLRequest;
-	import fl.controls.ButtonLabelPlacement;
 
 	public class Toolbar extends Sprite
 	{
