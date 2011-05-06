@@ -20,11 +20,11 @@
 		
 		/* requests */
 		public static const COMMAND_PARAMETER:String = "command=";
-		public static const GET_IMAGE_REQUEST:String = "<command name=\"getImage\" type=\"\" stage=\"\" />";
-		public static const GET_FIELD_REQUEST:String = "<command name=\"getField\" />";
-		public static const NEXT_STEP_REQUEST:String = "<command name=\"nextStep\" />";
-		public static const DELETE_VEGETABLE_REQUEST:String = "<command name=\"delVegetable\"><vegetable id=\"\" /></command>";
-		public static const ADD_VEGETABLE_REQUEST:String = "<command name=\"addVegetable\"><vegetable type=\"\" row=\"\" column=\"\" /></command>";
+		public static const GET_IMAGE_REQUEST:XML = <command name="getImage" type="" stage="" />;
+		public static const GET_FIELD_REQUEST:XML = <command name="getField" />;
+		public static const NEXT_STEP_REQUEST:XML = <command name="nextStep" />;
+		public static const DELETE_VEGETABLE_REQUEST:XML = <command name="delVegetable"><vegetable id="" /></command>;
+		public static const ADD_VEGETABLE_REQUEST:XML = <command name="addVegetable"><vegetable type="" row="" column="" /></command>;
 		
 		/* names of responce commands */
 		public static const FIELD_RESPONCE:String = "field";

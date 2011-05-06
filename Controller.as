@@ -5,6 +5,7 @@
 	import flash.events.IOErrorEvent;
 	import flash.events.Event;
 	import models.Vegetable;
+	import views.Farm;
 	import flash.net.URLRequestMethod;
 	import flash.display.Sprite;
 	import flash.display.Bitmap;
@@ -23,13 +24,13 @@
 		
 		private var imageLoader:Loader;
 		
-		public function Controller(obj:Object)
+		public function Controller(farm:Farm)
 		{
 			imageLoader = new Loader();
 			imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imageLoaderCompleteHandler);
 			imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageLoaderErrorHandler);
 			
-			farm = obj as Farm;
+			this.farm = farm;
 			loader = new URLLoader();
 			loader.addEventListener(IOErrorEvent.IO_ERROR, loaderErrorHandler);
 			loader.addEventListener(Event.COMPLETE, loaderCompleteHandler);
@@ -43,7 +44,7 @@
 		{
 			this.notLoadedImages = notLoadedImages;
 			
-			var xmlRequest:XML = new XML(Constants.GET_IMAGE_REQUEST);
+			var xmlRequest:XML = Constants.GET_IMAGE_REQUEST;
 			xmlRequest.@type = notLoadedImages[0].vtype;
 			xmlRequest.@stage = notLoadedImages[0].growthStage;
 			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
@@ -78,7 +79,7 @@
 		
 		private function loaderErrorHandler(event:IOErrorEvent):void
 		{
-			trace("error");
+			farm.showErrorMessage("connection lost");
 		}
 		
 		private function loaderCompleteHandler(event:Event):void
@@ -106,7 +107,7 @@
 		
 		public function getField():void
 		{
-			var xmlRequest:XML = new XML(Constants.GET_FIELD_REQUEST);
+			var xmlRequest:XML = Constants.GET_FIELD_REQUEST;
 			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			loader.load(request);
 		}
@@ -123,7 +124,7 @@
 		
 		public function nextStep():void
 		{
-			var xmlRequest:XML = new XML(Constants.NEXT_STEP_REQUEST);
+			var xmlRequest:XML = Constants.NEXT_STEP_REQUEST;
 			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			loader.load(request);
 		}
@@ -141,7 +142,8 @@
 		public function deleteVegetable(vegetable:Vegetable):void
 		{
 			this.id = vegetable.id;
-			var xmlRequest:XML = new XML(Constants.DELETE_VEGETABLE_REQUEST);
+
+			var xmlRequest:XML = Constants.DELETE_VEGETABLE_REQUEST;
 			xmlRequest.vegetable.@id = this.id;
 			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
 			
@@ -157,7 +159,7 @@
 		
 		public function addVegetable(type:String, row:int, column:int):void
 		{
-			var xmlRequest:XML = new XML(Constants.ADD_VEGETABLE_REQUEST);
+			var xmlRequest:XML = Constants.ADD_VEGETABLE_REQUEST;
 			xmlRequest.vegetable.@type = type;
 			xmlRequest.vegetable.@row = row;
 			xmlRequest.vegetable.@column = column;
