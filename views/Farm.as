@@ -9,7 +9,6 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Point;
-	import flash.text.TextField;
 	
 	public class Farm extends Sprite
 	{
@@ -27,21 +26,23 @@
 		public var currentState:String;
 		public var selectedVegType:String;
 		
-		private var messageSprite:Sprite;
-		
+		private var messageWindow:MessageWindow;
+
 		public var images:Object = {
-			potato: [{image: null, y0: 26},	{image: null, y0: 26}, {image: null, y0: 42},
-					 {image: null, y0: 45},	{image: null, y0: 50}
-				    ], 
-			clover: [{image: null, y0: 72},	{image: null, y0: 28}, {image: null, y0: 32},
-					 {image: null, y0: 42},	{image: null, y0: 44}
-				    ],
-			sunflower: [{image: null, y0: 27}, {image: null, y0: 44}, {image: null, y0: 59},
-					    {image: null, y0: 83}, {image: null, y0: 100}
-				    ]};
+			potato: [{y0: 26},	{y0: 26}, {y0: 42}, {y0: 45}, {y0: 50}], 
+			clover: [{y0: 72},	{y0: 28}, {y0: 32}, {y0: 42}, {y0: 44}],
+			sunflower: [{y0: 27}, {y0: 44}, {y0: 59}, {y0: 83}, {y0: 100}]
+		};
 
 		public function Farm()
 		{
+			field = new Sprite();
+			field.y = Constants.TOOLBAR_HEIGHT;
+			this.addChild(field);
+			
+			messageWindow = MessageWindow.getInstance();
+			this.addChild(messageWindow);
+			
 			controller = new Controller(this);
 			
             trace(this.parent);
@@ -54,9 +55,6 @@
 			backgroundWidth = bgLoader.width;
 			backgroundHeight = bgLoader.height;
 			
-			field = new Sprite();
-			field.y = Constants.TOOLBAR_HEIGHT;
-			this.addChild(field);
 			field.addChild(bgLoader);
 			
 			field.addEventListener(MouseEvent.MOUSE_DOWN, startDragging);
@@ -86,6 +84,14 @@
 						// point.y - row
 						controller.addVegetable(this.selectedVegType, point.y, point.x);
 					}
+					else
+					{
+						messageWindow.show(Constants.OUTSIDE_FIELD, Constants.MW_BOTTOM_LEFT, true);
+					}
+				}
+				else
+				{
+					messageWindow.show(Constants.VEGETABLE_ALREADY_EXISTS, Constants.MW_BOTTOM_LEFT, true);
 				}
 			}
 		}
@@ -180,25 +186,16 @@
 		private function vegetableClick(event:MouseEvent):void
 		{
 			if (currentState == Constants.HARVEST_STATE)
-				controller.deleteVegetable(event.target as Vegetable);
+				if ((event.target as Vegetable).growthStage < Constants.HARVEST_STAGE)
+					messageWindow.show(Constants.NOT_GROWN, Constants.MW_BOTTOM_LEFT, true);
+				else
+					controller.deleteVegetable(event.target as Vegetable);
 		}
 		
 		public function removeFromField(vegetable:Vegetable):void
 		{
 			vegetable.removeEventListener(MouseEvent.CLICK, vegetableClick);
 			field.removeChild(vegetable);
-		}
-		
-		public function showErrorMessage(message:String):void
-		{
-			messageSprite = new Sprite();
-			var text:TextField = new TextField();
-			text.text = message;
-			messageSprite.addChild(text);
-			trace(text.width, messageSprite.width);
-			messageSprite.x = windowWidth / 2;
-			messageSprite.y = windowHeight / 2;
-			this.addChild(messageSprite);
 		}
 	}
 }

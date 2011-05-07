@@ -6,6 +6,7 @@
 	import flash.events.Event;
 	import models.Vegetable;
 	import views.Farm;
+	import views.MessageWindow;
 	import flash.net.URLRequestMethod;
 	import flash.display.Sprite;
 	import flash.display.Bitmap;
@@ -19,6 +20,7 @@
 		private var farm:Farm;
 		private var id:int;
 		private var notLoadedImages:Array;
+		private var messageWindow:MessageWindow;
 		
 		public var vegetables:Array;
 		
@@ -31,6 +33,7 @@
 			imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageLoaderErrorHandler);
 			
 			this.farm = farm;
+			messageWindow = MessageWindow.getInstance();
 			loader = new URLLoader();
 			loader.addEventListener(IOErrorEvent.IO_ERROR, loaderErrorHandler);
 			loader.addEventListener(Event.COMPLETE, loaderCompleteHandler);
@@ -65,7 +68,7 @@
 		
 		private function imageLoaderErrorHandler(event:IOErrorEvent):void
 		{
-			trace("error");
+			messageWindow.show(Constants.CONNECTION_LOST_MESSAGE, Constants.MW_CENTER, false);
 		}
 		
 		private function getIndexByVegetableId(id:int):int
@@ -79,7 +82,7 @@
 		
 		private function loaderErrorHandler(event:IOErrorEvent):void
 		{
-			farm.showErrorMessage("connection lost");
+			messageWindow.show(Constants.CONNECTION_LOST_MESSAGE, Constants.MW_CENTER, false);
 		}
 		
 		private function loaderCompleteHandler(event:Event):void
@@ -88,7 +91,7 @@
 			var xml:XML = new XML(loader.data);
 			if (xml.name() == Constants.ERROR_RESPONCE)
 			{
-				trace("error");
+				messageWindow.show(Constants.ERROR_MESSAGE, Constants.MW_CENTER, false);
 			}
 			else
 			{

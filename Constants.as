@@ -2,6 +2,8 @@
 {
 	public class Constants
 	{
+		public static const HARVEST_STAGE:int = 5;
+		
 		/* toolbar */
 		public static const TOOLBAR_HEIGHT:int = 100;
 		public static const BUTTON_WIDTH:int = 70;
@@ -56,5 +58,16 @@
 		public static const COMPRESSION:Number = 0.5181;
 		
 		public static const VEGETABLE_X_OFFSET:int = 8;
+		
+		/* message window position */
+		public static const MW_CENTER:String = "center";
+		public static const MW_BOTTOM_LEFT:String = "bottom-left";
+		
+		/* messages */
+		public static const CONNECTION_LOST_MESSAGE:String = "Lost connection to server. Please restart application.";
+		public static const ERROR_MESSAGE:String = "Error occured. Please restart application.";
+		public static const VEGETABLE_ALREADY_EXISTS:String = "Vegetable already exists in this location. Please choose another one.";
+		public static const OUTSIDE_FIELD:String = "You've clicked outside the field.";
+		public static const NOT_GROWN:String = "Vegetable has not grown yet.";
 	}
 }
