@@ -15,6 +15,7 @@
 	{
 		private var moveButton:Sprite;
 		private var addButton:Sprite;
+		private var removeButton:Sprite;
 		private var harvestButton:Sprite;
 		private var nextStepButton:Sprite;
 		
@@ -52,11 +53,12 @@
 			// create buttons
 			moveButton = createButton(20, moveButtonClick, 5, 5, Constants.MOVE_BTN_BACKGROUND_URL);
 			addButton = createButton(110, addButtonClick, 5, 10, Constants.ADD_BTN_BACKGROUND_URL);
-			harvestButton = createButton(200, harvestButtonClick, 5, 15, Constants.HARVEST_BTN_BACKGROUND_URL);
-			nextStepButton = createButton(290, nextStepButtonClick, 5, 15, Constants.NEXTSTEP_BTN_BACKGROUND_URL);
-			addPotatoButton = createButton(450, addPotatoButtonClick, 5, 15, Constants.ADD_BTN_BACKGROUND_URL, false);
-			addCloverButton = createButton(540, addCloverButtonClick, 5, 15, Constants.ADD_CLOVER_BTN_BACKGROUND_URL, false);
-			addSunflowerButton = createButton(630, addSunflowerButtonClick, 10, 5, Constants.ADD_SUNFLOWER_BTN_BACKGROUND_URL, false);
+			removeButton = createButton(200, removeButtonClick, 5, 10, Constants.REMOVE_BTN_BACKGROUND_URL);
+			harvestButton = createButton(290, harvestButtonClick, 5, 15, Constants.HARVEST_BTN_BACKGROUND_URL);
+			nextStepButton = createButton(380, nextStepButtonClick, 5, 15, Constants.NEXTSTEP_BTN_BACKGROUND_URL);
+			addPotatoButton = createButton(470, addPotatoButtonClick, 5, 15, Constants.ADD_BTN_BACKGROUND_URL, false);
+			addCloverButton = createButton(560, addCloverButtonClick, 5, 15, Constants.ADD_CLOVER_BTN_BACKGROUND_URL, false);
+			addSunflowerButton = createButton(650, addSunflowerButtonClick, 10, 5, Constants.ADD_SUNFLOWER_BTN_BACKGROUND_URL, false);
 
 			// select buttons
 			moveButton.addChild(selection);
@@ -102,7 +104,7 @@
 			addCloverButton.visible = false;
 			addSunflowerButton.visible = false;
 			
-			(this.parent as Farm).currentState = Constants.MOVE_STATE;
+			(this.parent as Farm).setState(Constants.MOVE_STATE);
 		}
 		
 		private function addButtonClick(event:MouseEvent):void
@@ -117,8 +119,8 @@
 			addCloverButton.visible = true;
 			addSunflowerButton.visible = true;
 			
-			(this.parent as Farm).currentState = Constants.ADD_STATE;
-			(this.parent as Farm).selectedVegType = Constants.POTATO;
+			(this.parent as Farm).setState(Constants.ADD_STATE);
+			(this.parent as Farm).setSelectedVegType(Constants.POTATO);
 		}
 		
 		private function addPotatoButtonClick(event:MouseEvent):void
@@ -126,7 +128,7 @@
 			addBtnSelection.parent.removeChild(addBtnSelection);
 			addPotatoButton.addChild(addBtnSelection);
 			
-			(this.parent as Farm).selectedVegType = Constants.POTATO;
+			(this.parent as Farm).setSelectedVegType(Constants.POTATO);
 		}
 		
 		private function addCloverButtonClick(event:MouseEvent):void
@@ -134,7 +136,7 @@
 			addBtnSelection.parent.removeChild(addBtnSelection);
 			addCloverButton.addChild(addBtnSelection);
 			
-			(this.parent as Farm).selectedVegType = Constants.CLOVER;
+			(this.parent as Farm).setSelectedVegType(Constants.CLOVER);
 		}
 		
 		private function addSunflowerButtonClick(event:MouseEvent):void
@@ -142,7 +144,19 @@
 			addBtnSelection.parent.removeChild(addBtnSelection);
 			addSunflowerButton.addChild(addBtnSelection);
 			
-			(this.parent as Farm).selectedVegType = Constants.SUNFLOWER;
+			(this.parent as Farm).setSelectedVegType(Constants.SUNFLOWER);
+		}
+		
+		private function removeButtonClick(event:MouseEvent):void
+		{
+			selection.parent.removeChild(selection);
+			removeButton.addChild(selection);
+			
+			addPotatoButton.visible = false;
+			addCloverButton.visible = false;
+			addSunflowerButton.visible = false;
+			
+			(this.parent as Farm).setState(Constants.REMOVE_STATE);
 		}
 		
 		private function harvestButtonClick(event:MouseEvent):void
@@ -154,7 +168,7 @@
 			addCloverButton.visible = false;
 			addSunflowerButton.visible = false;
 			
-			(this.parent as Farm).currentState = Constants.HARVEST_STATE;
+			(this.parent as Farm).setState(Constants.HARVEST_STATE);
 		}
 		
 		private function nextStepButtonClick(event:MouseEvent):void
@@ -166,7 +180,7 @@
 			addCloverButton.visible = false;
 			addSunflowerButton.visible = false;
 			
-			(this.parent as Farm).currentState = Constants.MOVE_STATE;
+			(this.parent as Farm).setState(Constants.MOVE_STATE);
 			(this.parent as Farm).controller.nextStep();
 		}
 	}

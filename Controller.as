@@ -5,7 +5,7 @@
 	import flash.events.IOErrorEvent;
 	import flash.events.Event;
 	import models.Vegetable;
-	import views.Farm;
+	//import views.Farm;
 	import views.MessageWindow;
 	import flash.net.URLRequestMethod;
 	import flash.display.Sprite;
@@ -43,6 +43,7 @@
 			getField();
 		}
 		
+		/* load images from server */
 		public function getImages(notLoadedImages:Array):void
 		{
 			this.notLoadedImages = notLoadedImages;
@@ -108,6 +109,7 @@
 			}
 		}
 		
+		/* get field request */
 		public function getField():void
 		{
 			var xmlRequest:XML = Constants.GET_FIELD_REQUEST;
@@ -118,8 +120,9 @@
 		/* fills collection of vegetables */
 		private function getFieldHandler(xml:XML):void
 		{
-			farm.rowCount = xml.@rows;
-			farm.colCount = xml.@columns;
+			farm.setRowCount(xml.@rows);
+			farm.setColCount(xml.@columns);
+
 			for each (var vegetableXML:XML in xml.children())
 			{
 				vegetables.push(new Vegetable(vegetableXML));

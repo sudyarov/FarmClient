@@ -15,23 +15,24 @@
 
 			this.graphics.lineStyle(1, 0xCCCCCC);
 			
-			// draw ""
+			// draw rows
 			parent = this.parent.parent as Farm;
-			for (i = 0; i <= parent.rowCount; i++)
+			for (i = 0; i <= parent.getRowCount(); i++)
 			{
 				point = getCoords(i, 0);
 				this.graphics.moveTo(point.x, point.y);
 				
-				point = getCoords(i, parent.colCount);
+				point = getCoords(i, parent.getColCount());
 				this.graphics.lineTo(point.x, point.y);
 			}
 			
-			for (i = 0; i <= parent.colCount; i++)
+			// draw columns
+			for (i = 0; i <= parent.getColCount(); i++)
 			{
 				point = getCoords(0, i);
 				this.graphics.moveTo(point.x, point.y);
 				
-				point = getCoords(parent.colCount, i);
+				point = getCoords(parent.getColCount(), i);
 				this.graphics.lineTo(point.x, point.y);
 			}
 		}
@@ -77,8 +78,8 @@
 			// outside field
 			if ((result.x < 0) || (result.y < 0))
 				return null;
-			else if ((result.x > ((this.parent as Farm).colCount * Constants.COL_WIDTH)) || 
-					 (result.y > ((this.parent as Farm).rowCount * Constants.ROW_HEIGHT)))
+			else if ((result.x > ((this.parent as Farm).getColCount() * Constants.COL_WIDTH)) || 
+					 (result.y > ((this.parent as Farm).getRowCount() * Constants.ROW_HEIGHT)))
 				return null;
 			
 			// get row and column indexes

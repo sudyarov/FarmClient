@@ -14,6 +14,7 @@
 		public static const MOVE_STATE:String = "move";
 		public static const ADD_STATE:String = "add";
 		public static const HARVEST_STATE:String = "harvest";
+		public static const REMOVE_STATE:String = "remove";
 		
 		/* vegetable types */
 		public static const POTATO:String = "potato";
@@ -42,6 +43,7 @@
 		public static const TOOLBAR_BACKGROUND_URL:String = "images/toolbar.jpg";
 		public static const MOVE_BTN_BACKGROUND_URL:String = "images/move.png";
 		public static const ADD_BTN_BACKGROUND_URL:String = "images/add.png";
+		public static const REMOVE_BTN_BACKGROUND_URL:String = "images/remove.png";
 		public static const HARVEST_BTN_BACKGROUND_URL:String = "images/harvest.png";
 		public static const NEXTSTEP_BTN_BACKGROUND_URL:String = "images/nextStep.png";
 		public static const ADD_SUNFLOWER_BTN_BACKGROUND_URL:String = "images/add_sunflower.png";
