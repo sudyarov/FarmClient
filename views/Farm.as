@@ -14,8 +14,8 @@
 	{
 		private var bgLoader:Loader;
 		var controller:Controller;
-		public var windowWidth:int;
-		public var windowHeight:int;
+		//public var windowWidth:int;
+		//public var windowHeight:int;
 		private var backgroundWidth:int;
 		private var backgroundHeight:int;
 		
@@ -45,7 +45,6 @@
 			
 			controller = new Controller(this);
 			
-            trace(this.parent);
 			bgLoader = new Loader();
 			bgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 			bgLoader.load(new URLRequest(Constants.SERVER_URL + Constants.FIELD_BACKGROUND_URL));
@@ -118,12 +117,12 @@
 		{
 			if (field.x > 0)
 				field.x = 0;
-			else if (field.x < (windowWidth - backgroundWidth))
-				field.x = windowWidth - backgroundWidth;
+			else if (field.x < (stage.stageWidth - backgroundWidth))
+				field.x = stage.stageWidth - backgroundWidth;
 			if (field.y > Constants.TOOLBAR_HEIGHT)
 				field.y = Constants.TOOLBAR_HEIGHT;
-			else if (field.y < (windowHeight - backgroundHeight))
-				field.y = windowHeight - backgroundHeight;
+			else if (field.y < (stage.stageHeight - backgroundHeight))
+				field.y = stage.stageHeight - backgroundHeight;
 		}
 
 		private function loadImages():int

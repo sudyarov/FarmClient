@@ -55,7 +55,7 @@
 			if (closeOnTimer)
 			{
 				if (timer.running)
-					timer.stop;
+					timer.stop();
 				timer.start();
 			}
 			
