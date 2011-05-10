@@ -1,17 +1,15 @@
 ﻿package views
 {
-    import flash.display.SimpleButton;
     import flash.events.MouseEvent;
 	import flash.display.Sprite;
 	import flash.display.Loader;
 	import flash.net.URLRequest;
-	import flash.filters.GlowFilter;
-	import flash.filters.GradientGlowFilter;
 	import flash.filters.BitmapFilter;
 	import flash.filters.BevelFilter;
 	import flash.filters.BitmapFilterQuality;
 	import flash.display.Graphics;
-	import flash.filters.BitmapFilterType;
+	import flash.display.GradientType;
+	import flash.geom.Matrix;
 
 	public class Toolbar extends Sprite
 	{
@@ -24,38 +22,34 @@
 		private var addCloverButton:Sprite;
 		private var addSunflowerButton:Sprite;
 		
+		private var bevelFilter:BitmapFilter;
 		private var buttonFilters:Array = new Array();
 		
-	/*
-            var color:Number = 0x33CCFF;
-            var alpha:Number = 0.8;
-            var blurX:Number = 15;
-            var blurY:Number = 15;
-            var strength:Number = 2;
-            var inner:Boolean = true;
-            var knockout:Boolean = false;
-            var quality:Number = BitmapFilterQuality.HIGH;
-
-            return new GlowFilter(color,
-                                  alpha,
-                                  blurX,
-                                  blurY,
-                                  strength,
-                                  quality,
-                                  inner,
-                                  knockout);
-								  */
-
+		private var selection:Sprite;
+		private var addBtnSelection:Sprite;
 
 		public function Toolbar()
 		{
 			// create filters
-			buttonFilters.push(new BevelFilter(2, 45, 0xCCCCCC, 0.8, 0x000000, 0.8, 5, 5, 1, BitmapFilterQuality.HIGH));
+			bevelFilter = new BevelFilter(2, 45, 0xCCCCCC, 0.8, 0x000000, 0.8, 5, 5, 1, BitmapFilterQuality.HIGH);
+			buttonFilters.push(bevelFilter);
 			
+			// border for selected button
+			selection = new Sprite();
+			selection.graphics.lineStyle(2, 0x0066FF, 0.8);
+			selection.graphics.drawRoundRect(0, 0, Constants.BUTTON_WIDTH, Constants.BUTTON_HEIGHT, 15);
+			
+			// the same for "Add potato", "Add Clover" and "Add Sunflower" buttons
+			addBtnSelection = new Sprite();
+			addBtnSelection.graphics.lineStyle(2, 0x0066FF, 0.8);
+			addBtnSelection.graphics.drawRoundRect(0, 0, Constants.BUTTON_WIDTH, Constants.BUTTON_HEIGHT, 15);
+			
+			// toolbar background
 			var loader:Loader = new Loader();
 			this.addChild(loader);
 			loader.load(new URLRequest(Constants.SERVER_URL + Constants.TOOLBAR_BACKGROUND_URL));
 			
+			// create buttons
 			moveButton = createButton(20, moveButtonClick, 5, 5, Constants.MOVE_BTN_BACKGROUND_URL);
 			addButton = createButton(110, addButtonClick, 5, 10, Constants.ADD_BTN_BACKGROUND_URL);
 			harvestButton = createButton(200, harvestButtonClick, 5, 15, Constants.HARVEST_BTN_BACKGROUND_URL);
@@ -64,7 +58,9 @@
 			addCloverButton = createButton(540, addCloverButtonClick, 5, 15, Constants.ADD_CLOVER_BTN_BACKGROUND_URL, false);
 			addSunflowerButton = createButton(630, addSunflowerButtonClick, 10, 5, Constants.ADD_SUNFLOWER_BTN_BACKGROUND_URL, false);
 
-			//moveButton.emphasized = true;
+			// select buttons
+			moveButton.addChild(selection);
+			addPotatoButton.addChild(addBtnSelection);
 		}
 		
 		private function createButton(x:int, clickListener:Function, iconX:int, iconY:int, 
@@ -74,14 +70,17 @@
 			button.x = x;
 			button.y = Constants.TOP_MARGIN;
 			
-			button.graphics.lineStyle(0xFFFFFFFF, 3);
-			button.graphics.beginFill(0x79ae6a);
+			// draw buttons
+			var matrix:Matrix = new Matrix();
+			matrix.createGradientBox(Constants.BUTTON_WIDTH, Constants.BUTTON_HEIGHT, Math.PI / 2);
+			button.graphics.beginGradientFill(GradientType.LINEAR, [0xEEEEEE, 0x79ae6a], [0.4,0.9], [0,127], matrix);
 			button.graphics.drawRoundRect(0, 0, Constants.BUTTON_WIDTH, Constants.BUTTON_HEIGHT, 15);
 			button.graphics.endFill();
 			button.filters = buttonFilters;
 			
 			button.visible = visible;
 			button.addEventListener(MouseEvent.CLICK, clickListener);
+
 			this.addChild(button);
 			
 			var loader:Loader = new Loader();
@@ -93,13 +92,12 @@
 			return button;
 		}
 		
+		/* button click handlers */
 		private function moveButtonClick(event:MouseEvent):void
 		{
-			/*
-			moveButton.emphasized = true;
-			addButton.emphasized = false;
-			harvestButton.emphasized = false;
-			*/
+			selection.parent.removeChild(selection);
+			moveButton.addChild(selection);
+			
 			addPotatoButton.visible = false;
 			addCloverButton.visible = false;
 			addSunflowerButton.visible = false;
@@ -109,15 +107,12 @@
 		
 		private function addButtonClick(event:MouseEvent):void
 		{
-            /*
-			moveButton.emphasized = false;
-			addButton.emphasized = true;
-			harvestButton.emphasized = false;
+            selection.parent.removeChild(selection);
+			addButton.addChild(selection);
 			
-			addPotatoButton.emphasized = true;
-			addCloverButton.emphasized = false;
-			addSunflowerButton.emphasized = false;
-			*/
+			addBtnSelection.parent.removeChild(addBtnSelection);
+			addPotatoButton.addChild(addBtnSelection);
+			
 			addPotatoButton.visible = true;
 			addCloverButton.visible = true;
 			addSunflowerButton.visible = true;
@@ -128,42 +123,33 @@
 		
 		private function addPotatoButtonClick(event:MouseEvent):void
 		{
-			/*
-			addPotatoButton.emphasized = true;
-			addCloverButton.emphasized = false;
-			addSunflowerButton.emphasized = false;
-			*/
-			(this.parent as Farm).selectedVegType = Constants.POTATO;
+			addBtnSelection.parent.removeChild(addBtnSelection);
+			addPotatoButton.addChild(addBtnSelection);
 			
+			(this.parent as Farm).selectedVegType = Constants.POTATO;
 		}
 		
 		private function addCloverButtonClick(event:MouseEvent):void
 		{
-			/*
-			addPotatoButton.emphasized = false;
-			addCloverButton.emphasized = true;
-			addSunflowerButton.emphasized = false;
-			*/
+			addBtnSelection.parent.removeChild(addBtnSelection);
+			addCloverButton.addChild(addBtnSelection);
+			
 			(this.parent as Farm).selectedVegType = Constants.CLOVER;
 		}
 		
 		private function addSunflowerButtonClick(event:MouseEvent):void
 		{
-			/*
-			addPotatoButton.emphasized = false;
-			addCloverButton.emphasized = false;
-			addSunflowerButton.emphasized = true;
-			*/
+			addBtnSelection.parent.removeChild(addBtnSelection);
+			addSunflowerButton.addChild(addBtnSelection);
+			
 			(this.parent as Farm).selectedVegType = Constants.SUNFLOWER;
 		}
 		
 		private function harvestButtonClick(event:MouseEvent):void
 		{
-			/*
-			moveButton.emphasized = false;
-			addButton.emphasized = false;
-			harvestButton.emphasized = true;
-			*/
+			selection.parent.removeChild(selection);
+			harvestButton.addChild(selection);
+			
 			addPotatoButton.visible = false;
 			addCloverButton.visible = false;
 			addSunflowerButton.visible = false;
@@ -173,11 +159,9 @@
 		
 		private function nextStepButtonClick(event:MouseEvent):void
 		{
-			/*
-			moveButton.emphasized = true;
-			addButton.emphasized = false;
-			harvestButton.emphasized = false;
-			*/
+			selection.parent.removeChild(selection);
+			moveButton.addChild(selection);
+			
 			addPotatoButton.visible = false;
 			addCloverButton.visible = false;
 			addSunflowerButton.visible = false;
