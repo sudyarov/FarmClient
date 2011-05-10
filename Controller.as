@@ -118,10 +118,13 @@
 		/* fills collection of vegetables */
 		private function getFieldHandler(xml:XML):void
 		{
+			farm.rowCount = xml.@rows;
+			farm.colCount = xml.@columns;
 			for each (var vegetableXML:XML in xml.children())
 			{
 				vegetables.push(new Vegetable(vegetableXML));
 			}
+			farm.initComponents();
 			farm.draw();
 		}
 		

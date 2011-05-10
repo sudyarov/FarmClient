@@ -5,29 +5,33 @@
 	
 	public class Grid extends Sprite
 	{
-		public function Grid()
+		public function Grid() {}
+		
+		public function draw():void
 		{
 			var point:Point;
 			var i:int;
+			var parent:Farm;
 
 			this.graphics.lineStyle(1, 0xCCCCCC);
 			
 			// draw ""
-			for (i = 0; i <= Constants.ROW_COUNT; i++)
+			parent = this.parent.parent as Farm;
+			for (i = 0; i <= parent.rowCount; i++)
 			{
 				point = getCoords(i, 0);
 				this.graphics.moveTo(point.x, point.y);
 				
-				point = getCoords(i, Constants.COL_COUNT);
+				point = getCoords(i, parent.colCount);
 				this.graphics.lineTo(point.x, point.y);
 			}
 			
-			for (i = 0; i <= Constants.COL_COUNT; i++)
+			for (i = 0; i <= parent.colCount; i++)
 			{
 				point = getCoords(0, i);
 				this.graphics.moveTo(point.x, point.y);
 				
-				point = getCoords(Constants.COL_COUNT, i);
+				point = getCoords(parent.colCount, i);
 				this.graphics.lineTo(point.x, point.y);
 			}
 		}
@@ -73,8 +77,8 @@
 			// outside field
 			if ((result.x < 0) || (result.y < 0))
 				return null;
-			else if ((result.x > (Constants.COL_COUNT * Constants.COL_WIDTH)) || 
-					 (result.y > (Constants.ROW_COUNT * Constants.ROW_HEIGHT)))
+			else if ((result.x > ((this.parent as Farm).colCount * Constants.COL_WIDTH)) || 
+					 (result.y > ((this.parent as Farm).rowCount * Constants.ROW_HEIGHT)))
 				return null;
 			
 			// get row and column indexes

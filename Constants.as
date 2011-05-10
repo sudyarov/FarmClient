@@ -50,8 +50,6 @@
 		/* field constants*/
 		public static const FIELD_X0_PX:int = 120;
 		public static const FIELD_Y0_PX:int = 432;
-		public static const ROW_COUNT:int = 11;
-		public static const COL_COUNT:int = 11;
 		public static const ROW_HEIGHT:int = 80;
 		public static const COL_WIDTH:int = 80;
 		public static const ROTATE_ANGLE:Number = 0.7854;

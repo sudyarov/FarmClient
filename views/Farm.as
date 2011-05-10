@@ -14,8 +14,6 @@
 	{
 		private var bgLoader:Loader;
 		var controller:Controller;
-		//public var windowWidth:int;
-		//public var windowHeight:int;
 		private var backgroundWidth:int;
 		private var backgroundHeight:int;
 		
@@ -25,6 +23,9 @@
 		
 		public var currentState:String;
 		public var selectedVegType:String;
+		
+		public var rowCount:int;
+		public var colCount:int;
 		
 		private var messageWindow:MessageWindow;
 
@@ -59,12 +60,16 @@
 			field.addEventListener(MouseEvent.MOUSE_DOWN, startDragging);
 			field.addEventListener(MouseEvent.MOUSE_UP, stopDragging);
 			field.addEventListener(MouseEvent.MOUSE_OUT, stopDragging);
-			
+		}
+		
+		public function initComponents():void
+		{
 			toolbar = new Toolbar();
 			this.addChild(toolbar);
 			
 			grid = new Grid();
 			field.addChild(grid);
+			grid.draw();
 			field.addEventListener(MouseEvent.CLICK, fieldClick);
 			
 			currentState = Constants.MOVE_STATE;
