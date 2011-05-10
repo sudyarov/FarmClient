@@ -11,12 +11,11 @@
 		{
 			var point:Point;
 			var i:int;
-			var parent:Farm;
+			var parent:Farm = this.parent.parent as Farm;
 
 			this.graphics.lineStyle(1, 0xCCCCCC);
 			
 			// draw rows
-			parent = this.parent.parent as Farm;
 			for (i = 0; i <= parent.getRowCount(); i++)
 			{
 				point = getCoords(i, 0);
@@ -62,6 +61,7 @@
 		public function getCell(x:Number, y:Number):Point
 		{
 			var result:Point = new Point();
+			var parent:Farm = this.parent.parent as Farm;
 			
 			x -= Constants.FIELD_X0_PX;
 			y -= Constants.FIELD_Y0_PX;
@@ -78,8 +78,8 @@
 			// outside field
 			if ((result.x < 0) || (result.y < 0))
 				return null;
-			else if ((result.x > ((this.parent as Farm).getColCount() * Constants.COL_WIDTH)) || 
-					 (result.y > ((this.parent as Farm).getRowCount() * Constants.ROW_HEIGHT)))
+			else if ((result.x > (parent.getColCount() * Constants.COL_WIDTH)) || 
+					 (result.y > (parent.getRowCount() * Constants.ROW_HEIGHT)))
 				return null;
 			
 			// get row and column indexes
