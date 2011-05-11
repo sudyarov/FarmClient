@@ -2,7 +2,8 @@
 {
 	import flash.display.Sprite;
 	import flash.display.Loader;
-	import flash.net.URLRequest;
+import flash.display.StageAlign;
+import flash.net.URLRequest;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import models.Vegetable;	
@@ -52,6 +53,7 @@
 			bgLoader = new Loader();
 			bgLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 			bgLoader.load(new URLRequest(Constants.SERVER_URL + Constants.FIELD_BACKGROUND_URL));
+            stage.align = StageAlign.TOP_LEFT;
 		}
 		
 		private function onLoadComplete(e:Event):void {
