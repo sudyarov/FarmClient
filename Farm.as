@@ -138,7 +138,7 @@ import flash.net.URLRequest;
 		}
 
 		/* load vegetable images if necessary */
-		private function loadImages():int
+		private function loadImages(isNew:Boolean):int
 		{
 			var growthStage:int;
 			var result:int = 0;
@@ -156,18 +156,18 @@ import flash.net.URLRequest;
 			}
 			
 			if (result != 0)
-				controller.getImages(notLoadedImages);
+				controller.getImages(notLoadedImages, isNew);
 			
 			return result;
 		}
 		
-		public function draw():void
+		public function draw(isNew:Boolean):void
 		{
-			if (loadImages() == 0)
-				drawVegetables();
+			if (loadImages(isNew) == 0)
+				drawVegetables(isNew);
 		}
 		
-		public function drawVegetables():void
+		public function drawVegetables(isNew:Boolean):void
 		{
 			var growthStage:int;
 			var point:Point;
@@ -193,6 +193,32 @@ import flash.net.URLRequest;
 				vegetable.y = point.y - images[vegetable.type][growthStage].y0;
 				vegetable.addChild(new Bitmap((images[vegetable.type][growthStage].image as BitmapData).clone()));
 			}
+            if (isNew)
+            {
+                var index:int = field.numChildren - 1;
+                var newVegetable:Vegetable = field.getChildAt(index) as Vegetable;
+                var row:int = rowCount - 1;
+                var column:int = colCount - 1;
+
+                for (var i:int = 0; i < controller.vegetables.length - 1; i++)
+                {
+                    var vegetable:Vegetable = controller.vegetables[i];
+                    if ((vegetable.column > newVegetable.column) ||
+                        ((vegetable.column == newVegetable.column) && (vegetable.row < newVegetable.row)))
+                    {
+                        if ((vegetable.column < column) ||
+                            ((vegetable.column == column) && (vegetable.row > row)))
+                        {
+                            row = vegetable.row;
+                            column = vegetable.column;
+                            index = field.getChildIndex(vegetable);
+                        }
+                    }
+                }
+
+                if (index != field.numChildren - 1)
+                    field.setChildIndex(newVegetable, index);
+            }
 		}
 		
 		/* harvest or remove vegetable */

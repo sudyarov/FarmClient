@@ -21,6 +21,7 @@
 		private var id:int;
 		private var notLoadedImages:Array;
 		private var messageWindow:MessageWindow;
+        private var isNew:Boolean;
 		
 		public var vegetables:Array;
 		
@@ -44,8 +45,9 @@
 		}
 		
 		/* load images from server */
-		public function getImages(notLoadedImages:Array):void
+		public function getImages(notLoadedImages:Array, isNew:Boolean):void
 		{
+            this.isNew = isNew;
 			this.notLoadedImages = notLoadedImages;
 			
 			var xmlRequest:XML = Constants.GET_IMAGE_REQUEST;
@@ -62,9 +64,9 @@
 
 			this.notLoadedImages.shift();
 			if (this.notLoadedImages.length != 0)
-				getImages(notLoadedImages);
+				getImages(notLoadedImages, this.isNew);
 			else
-				farm.drawVegetables();
+				farm.drawVegetables(this.isNew);
 		}
 		
 		private function imageLoaderErrorHandler(event:IOErrorEvent):void
@@ -128,7 +130,7 @@
 				vegetables.push(new Vegetable(vegetableXML));
 			}
 			farm.initComponents();
-			farm.draw();
+			farm.draw(false);
 		}
 		
 		public function nextStep():void
@@ -145,7 +147,7 @@
 				if (vegetable.growthStage < 5)
 					vegetable.growthStage++;
 			}
-			farm.draw();
+			farm.draw(false);
 		}
 		
 		public function deleteVegetable(vegetable:Vegetable):void
@@ -180,7 +182,7 @@
 		private function addVegetableHandler(xml:XML):void
 		{
 			vegetables.push(new Vegetable(XML(xml.vegetable)));
-			farm.draw();
+			farm.draw(true);
 		}
 	}
 }
