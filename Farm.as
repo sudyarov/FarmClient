@@ -6,7 +6,10 @@ import flash.display.StageAlign;
 import flash.net.URLRequest;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import models.Vegetable;	
+
+import images.ImageManager;
+
+import models.Vegetable;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Point;
@@ -32,8 +35,9 @@ import flash.net.URLRequest;
 		private var colCount:int;
 		
 		private var messageWindow:MessageWindow;
+        private var imageManager:ImageManager;
 
-		public var images:Object = {
+		public var vegImages:Object = {
 			potato: [{y0: 26},	{y0: 26}, {y0: 42}, {y0: 45}, {y0: 50}], 
 			clover: [{y0: 72},	{y0: 28}, {y0: 32}, {y0: 42}, {y0: 44}],
 			sunflower: [{y0: 27}, {y0: 44}, {y0: 59}, {y0: 83}, {y0: 100}]
@@ -47,6 +51,8 @@ import flash.net.URLRequest;
 			
 			messageWindow = MessageWindow.getInstance();
 			this.addChild(messageWindow);
+
+            imageManager = new ImageManager(this);
 			
 			controller = new Controller(this);
 			
@@ -143,20 +149,33 @@ import flash.net.URLRequest;
 			var growthStage:int;
 			var result:int = 0;
 			var notLoadedImages:Array = new Array();
+            var i:int;
 			
 			for each (var vegetable:Vegetable in controller.vegetables)
 			{
 				growthStage = vegetable.growthStage - 1;
 
-				if (images[vegetable.type][growthStage].image == null)
+				if (vegImages[vegetable.type][growthStage].image == null)
 				{
-					notLoadedImages.push({vtype: vegetable.type, growthStage: vegetable.growthStage});
-					result++;
+                    for (i = 0; i < notLoadedImages.length; i++)
+                    {
+                        if ((notLoadedImages[i].vtype == vegetable.type) && (notLoadedImages[i].growthStage == vegetable.growthStage))
+                            break;
+                    }
+
+                    if (i == notLoadedImages.length)
+                    {
+                        notLoadedImages.push({vtype: vegetable.type, growthStage: vegetable.growthStage});
+                        result++;
+                    }
 				}
 			}
 			
 			if (result != 0)
-				controller.getImages(notLoadedImages, isNew);
+            {
+                toolbar.disable();
+				imageManager.getImages(notLoadedImages, isNew);
+            }
 			
 			return result;
 		}
@@ -190,9 +209,10 @@ import flash.net.URLRequest;
 					(vegetable as Vegetable).removeChild(child);
 					child = null;
 				}
-				vegetable.y = point.y - images[vegetable.type][growthStage].y0;
-				vegetable.addChild(new Bitmap((images[vegetable.type][growthStage].image as BitmapData).clone()));
+				vegetable.y = point.y - vegImages[vegetable.type][growthStage].y0;
+				vegetable.addChild(new Bitmap((vegImages[vegetable.type][growthStage].image as BitmapData).clone()));
 			}
+
             if (isNew)
             {
                 var index:int = field.numChildren - 1;
@@ -219,6 +239,9 @@ import flash.net.URLRequest;
                 if (index != field.numChildren - 1)
                     field.setChildIndex(newVegetable, index);
             }
+
+            if (!toolbar.enabled())
+                toolbar.enable();
 		}
 		
 		/* harvest or remove vegetable */

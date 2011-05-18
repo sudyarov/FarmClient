@@ -3,7 +3,8 @@
     import flash.events.MouseEvent;
 	import flash.display.Sprite;
 	import flash.display.Loader;
-	import flash.net.URLRequest;
+import flash.filters.GlowFilter;
+import flash.net.URLRequest;
 	import flash.filters.BitmapFilter;
 	import flash.filters.BevelFilter;
 	import flash.filters.BitmapFilterQuality;
@@ -24,16 +25,26 @@
 		private var addSunflowerButton:Sprite;
 		
 		private var bevelFilter:BitmapFilter;
-		private var buttonFilters:Array = new Array();
-		
+		private var buttonFilters:Array;
+
+        private var glowFilter:BitmapFilter;
+        private var iconFilters:Array;
+
 		private var selection:Sprite;
 		private var addBtnSelection:Sprite;
+
+        private var _enabled:Boolean;
 
 		public function Toolbar()
 		{
 			// create filters
 			bevelFilter = new BevelFilter(2, 45, 0xCCCCCC, 0.8, 0x000000, 0.8, 5, 5, 1, BitmapFilterQuality.HIGH);
+            buttonFilters = new Array();
 			buttonFilters.push(bevelFilter);
+
+            glowFilter = new GlowFilter(0x999999, 0.7, 100, 100, 2, BitmapFilterQuality.HIGH, true);
+            iconFilters = new Array();
+            iconFilters.push(glowFilter);
 			
 			// border for selected button
 			selection = new Sprite();
@@ -63,7 +74,58 @@
 			// select buttons
 			moveButton.addChild(selection);
 			addPotatoButton.addChild(addBtnSelection);
-		}
+
+            _enabled = true;
+        }
+
+        public function enable():void
+        {
+            /* fade */
+            moveButton.getChildAt(0).filters = [];
+            addButton.getChildAt(0).filters = [];
+            removeButton.getChildAt(0).filters = [];
+            harvestButton.getChildAt(0).filters = [];
+            nextStepButton.getChildAt(0).filters = [];
+            addPotatoButton.getChildAt(0).filters = [];
+            addCloverButton.getChildAt(0).filters = [];
+            addSunflowerButton.getChildAt(0).filters = [];
+
+            /* add listeners */
+            moveButton.addEventListener(MouseEvent.CLICK, moveButtonClick);
+            addButton.addEventListener(MouseEvent.CLICK, addButtonClick);
+            removeButton.addEventListener(MouseEvent.CLICK, removeButtonClick);
+            harvestButton.addEventListener(MouseEvent.CLICK, harvestButtonClick);
+            nextStepButton.addEventListener(MouseEvent.CLICK, nextStepButtonClick);
+            addPotatoButton.addEventListener(MouseEvent.CLICK, addPotatoButtonClick);
+            addCloverButton.addEventListener(MouseEvent.CLICK, addCloverButtonClick);
+            addSunflowerButton.addEventListener(MouseEvent.CLICK, addSunflowerButtonClick);
+
+            _enabled = true;
+        }
+
+        public function disable():void
+        {
+            moveButton.getChildAt(0).filters = iconFilters;
+            addButton.getChildAt(0).filters = iconFilters;
+            removeButton.getChildAt(0).filters = iconFilters;
+            harvestButton.getChildAt(0).filters = iconFilters;
+            nextStepButton.getChildAt(0).filters = iconFilters;
+            addPotatoButton.getChildAt(0).filters = iconFilters;
+            addCloverButton.getChildAt(0).filters = iconFilters;
+            addSunflowerButton.getChildAt(0).filters = iconFilters;
+
+            /* add listeners */
+            moveButton.removeEventListener(MouseEvent.CLICK, moveButtonClick);
+            addButton.removeEventListener(MouseEvent.CLICK, addButtonClick);
+            removeButton.removeEventListener(MouseEvent.CLICK, removeButtonClick);
+            harvestButton.removeEventListener(MouseEvent.CLICK, harvestButtonClick);
+            nextStepButton.removeEventListener(MouseEvent.CLICK, nextStepButtonClick);
+            addPotatoButton.removeEventListener(MouseEvent.CLICK, addPotatoButtonClick);
+            addCloverButton.removeEventListener(MouseEvent.CLICK, addCloverButtonClick);
+            addSunflowerButton.removeEventListener(MouseEvent.CLICK, addSunflowerButtonClick);
+
+            _enabled = false;
+        }
 		
 		private function createButton(x:int, clickListener:Function, iconX:int, iconY:int, 
 									  icon:String, visible:Boolean = true):Sprite
@@ -183,5 +245,10 @@
 			(this.parent as Farm).setState(Constants.MOVE_STATE);
 			(this.parent as Farm).controller.nextStep();
 		}
+
+        public function enabled():Boolean
+        {
+            return _enabled;
+        }
 	}
 }

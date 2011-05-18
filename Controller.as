@@ -8,10 +8,6 @@
 	//import views.Farm;
 	import views.MessageWindow;
 	import flash.net.URLRequestMethod;
-	import flash.display.Sprite;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
-	import flash.display.Loader;
 
 	public class Controller
 	{
@@ -19,20 +15,13 @@
 		private var request:URLRequest;
 		private var farm:Farm;
 		private var id:int;
-		private var notLoadedImages:Array;
 		private var messageWindow:MessageWindow;
         private var isNew:Boolean;
 		
 		public var vegetables:Array;
-		
-		private var imageLoader:Loader;
-		
+
 		public function Controller(farm:Farm)
 		{
-			imageLoader = new Loader();
-			imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, imageLoaderCompleteHandler);
-			imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageLoaderErrorHandler);
-			
 			this.farm = farm;
 			messageWindow = MessageWindow.getInstance();
 			loader = new URLLoader();
@@ -42,36 +31,6 @@
 			request.method = URLRequestMethod.POST;
 			vegetables = new Array();
 			getField();
-		}
-		
-		/* load images from server */
-		public function getImages(notLoadedImages:Array, isNew:Boolean):void
-		{
-            this.isNew = isNew;
-			this.notLoadedImages = notLoadedImages;
-			
-			var xmlRequest:XML = Constants.GET_IMAGE_REQUEST;
-			xmlRequest.@type = notLoadedImages[0].vtype;
-			xmlRequest.@stage = notLoadedImages[0].growthStage;
-			request.data = Constants.COMMAND_PARAMETER + xmlRequest.toXMLString();
-			imageLoader.load(request);
-		}
-		
-		private function imageLoaderCompleteHandler(event:Event):void
-		{
-			var veg:Object = this.notLoadedImages[0];
-			farm.images[veg.vtype][veg.growthStage - 1].image = Bitmap(imageLoader.content).bitmapData.clone();
-
-			this.notLoadedImages.shift();
-			if (this.notLoadedImages.length != 0)
-				getImages(notLoadedImages, this.isNew);
-			else
-				farm.drawVegetables(this.isNew);
-		}
-		
-		private function imageLoaderErrorHandler(event:IOErrorEvent):void
-		{
-			messageWindow.show(Constants.CONNECTION_LOST_MESSAGE, Constants.MW_CENTER, false);
 		}
 		
 		private function getIndexByVegetableId(id:int):int
